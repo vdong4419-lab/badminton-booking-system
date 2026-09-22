@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosClient from '../axiosClient';
+import guiYeuCauApi from "../../api/gui-yeu-cau-api";
 import { User, Lock, LogOut, Camera } from 'lucide-react';
 
 export default function Profile() {
@@ -10,8 +10,8 @@ export default function Profile() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Lấy thông tin tài khoản hiện tại từ API PB06
-    axiosClient
+    // Lấy thông tin tài khoản hiện tại từ API
+    guiYeuCauApi
       .get('/users/profile')
       .then((res) => setUser(res.data))
       .catch((err) => setError('Không thể tải thông tin cá nhân'));
@@ -22,7 +22,7 @@ export default function Profile() {
     setMessage('');
     setError('');
     try {
-      const res = await axiosClient.put('/users/profile', {
+      const res = await guiYeuCauApi.put('/users/profile', {
         full_name: user.full_name,
         email: user.email,
         avatar: user.avatar,
@@ -38,7 +38,7 @@ export default function Profile() {
     setMessage('');
     setError('');
     try {
-      const res = await axiosClient.put('/users/change-password', passwordData);
+      const res = await guiYeuCauApi.put('/users/change-password', passwordData);
       setMessage(res.data.message);
       setPasswordData({ old_password: '', new_password: '' });
     } catch (err) {
@@ -48,7 +48,8 @@ export default function Profile() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    localStorage.removeItem('nguoi_dung');
+    window.location.href = '/dang-nhap';
   };
 
   return (
@@ -107,7 +108,7 @@ export default function Profile() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
                   <input
                     type="text"
-                    value={user.full_name}
+                    value={user.full_name || ''}
                     onChange={(e) => setUser({ ...user, full_name: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   />
@@ -116,7 +117,7 @@ export default function Profile() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại (Cố định)</label>
                   <input
                     type="text"
-                    value={user.phone}
+                    value={user.phone || ''}
                     disabled
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed"
                   />
@@ -127,7 +128,7 @@ export default function Profile() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email liên hệ</label>
                 <input
                   type="email"
-                  value={user.email}
+                  value={user.email || ''}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
