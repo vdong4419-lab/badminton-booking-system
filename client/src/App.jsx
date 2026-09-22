@@ -26,7 +26,9 @@ import XacNhanKhachDen from './pages/le-tan/XacNhanKhachDen';
 import ThongKeBaoCao from './pages/admin/ThongKeBaoCao';
 import QuanLySan from './pages/admin/QuanLySan';
 import QuanLyNhanVien from './pages/admin/QuanLyNhanVien';
-
+import QuanLyGiaSan from './pages/admin/QuanLyGiaSan';
+import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai';
+import QuanLyKhachHang from './pages/admin/QuanLyKhachHang';
 export default function App() {
   return (
     <Router>
@@ -58,6 +60,9 @@ export default function App() {
             <Route path="admin/thong-ke" element={<ThongKeBaoCao />} />
             <Route path="admin/quan-ly-san" element={<QuanLySan />} />
             <Route path="admin/quan-ly-nhan-vien" element={<QuanLyNhanVien />} />
+            <Route path="admin/quan-ly-gia" element={<QuanLyGiaSan />} />
+<Route path="admin/quan-ly-khuyen-mai" element={<QuanLyKhuyenMai />} />
+<Route path="admin/quan-ly-khach-hang" element={<QuanLyKhachHang />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

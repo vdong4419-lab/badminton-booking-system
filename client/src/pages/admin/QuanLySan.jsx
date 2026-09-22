@@ -1,107 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import guiYeuCauApi from '../../api/gui-yeu-cau-api';
-import { Plus, Edit, Trash2, LayoutGrid } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings, Plus, Edit2, Trash2, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 export default function QuanLySan() {
-  const [danhSachSan, setDanhSachSan] = useState([]);
-  const [tenSan, setTenSan] = useState('');
-  const [loaiSan, setLoaiSan] = useState('Trong nhà');
-  const [giaTheoGio, setGiaTheoGio] = useState(80000);
-
-  const taiDanhSachSan = async () => {
-    const res = await guiYeuCauApi.get('/khach-hang/danh-sach-san');
-    setDanhSachSan(res.data);
-  };
-
-  useEffect(() => {
-    taiDanhSachSan();
-  }, []);
-
-  const xuLyThemSan = async (e) => {
-    e.preventDefault();
-    try {
-      await guiYeuCauApi.post('/admin/them-san', {
-        ten_san: tenSan,
-        loai_san: loaiSan,
-        gia_theo_gio: giaTheoGio
-      });
-      alert('Thêm sân thành công!');
-      setTenSan('');
-      taiDanhSachSan();
-    } catch (err) {
-      alert('Lỗi thêm sân!');
-    }
-  };
+  const [danhSachSan, setDanhSachSan] = useState([
+    { id: 1, tenSan: 'Sân 01 - Thảm Yonex VIP', loaiSan: 'VIP', khuVuc: 'Khu A - Tầng 1', giaTheoGio: 120000, trangThai: 'hoat_dong' },
+    { id: 2, tenSan: 'Sân 02 - Thảm Victor Standard', loaiSan: 'Tiêu chuẩn', khuVuc: 'Khu A - Tầng 1', giaTheoGio: 100000, trangThai: 'hoat_dong' },
+    { id: 3, tenSan: 'Sân 03 - Thảm Lining', loaiSan: 'Tiêu chuẩn', khuVuc: 'Khu B - Tầng 2', giaTheoGio: 100000, trangThai: 'bao_tri' },
+  ]);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold flex items-center gap-2 text-gray-800">
-        <LayoutGrid className="w-7 h-7 text-emerald-600" /> Quản Lý Danh Sách Sân
-      </h1>
-
-      {/* Form Thêm Sân */}
-      <form onSubmit={xuLyThemSan} className="bg-white p-5 rounded-2xl border shadow-sm flex gap-4 items-end">
-        <div className="flex-1">
-          <label className="block text-sm font-semibold mb-1">Tên sân</label>
-          <input
-            type="text"
-            placeholder="Ví dụ: Sân số 1"
-            value={tenSan}
-            onChange={(e) => setTenSan(e.target.value)}
-            required
-            className="w-full border p-2.5 rounded-xl"
-          />
+    <div className="max-w-7xl mx-auto space-y-6 pb-10">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800">Quản Lý Sân Cầu Lông</h1>
+          <p className="text-xs text-slate-500 mt-1">Danh sách sân, thông tin thảm thi đấu và cấu hình hoạt động</p>
         </div>
-        <div className="w-48">
-          <label className="block text-sm font-semibold mb-1">Loại sân</label>
-          <select value={loaiSan} onChange={(e) => setLoaiSan(e.target.value)} className="w-full border p-2.5 rounded-xl">
-            <option value="Trong nhà">Trong nhà</option>
-            <option value="Ngoài trời">Ngoài trời</option>
-            <option value="VIP">Sân VIP</option>
-          </select>
-        </div>
-        <div className="w-48">
-          <label className="block text-sm font-semibold mb-1">Giá/Giờ (đ)</label>
-          <input
-            type="number"
-            value={giaTheoGio}
-            onChange={(e) => setGiaTheoGio(e.target.value)}
-            className="w-full border p-2.5 rounded-xl"
-          />
-        </div>
-        <button type="submit" className="bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-1 hover:bg-emerald-700">
-          <Plus className="w-5 h-5" /> Thêm Sân
+        <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-md">
+          <Plus size={16} /> Thêm Sân Mới
         </button>
-      </form>
+      </div>
 
-      {/* Bảng Danh Sách Sân */}
-      <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b text-gray-700">
-            <tr>
-              <th className="p-4">Mã Sân</th>
-              <th className="p-4">Tên Sân</th>
-              <th className="p-4">Loại Sân</th>
-              <th className="p-4">Giá/Giờ</th>
-              <th className="p-4">Trạng Thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {danhSachSan.map((san) => (
-              <tr key={san.id} className="border-b hover:bg-gray-50">
-                <td className="p-4 font-bold">#{san.id}</td>
-                <td className="p-4 font-semibold">{san.ten_san}</td>
-                <td className="p-4">{san.loai_san}</td>
-                <td className="p-4 font-bold text-emerald-600">{Number(san.gia_theo_gio || 80000).toLocaleString()} đ</td>
-                <td className="p-4">
-                  <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">
-                    {san.trang_thai}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid md:grid-cols-3 gap-6">
+        {danhSachSan.map((san) => (
+          <div key={san.id} className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4 hover:shadow-md transition-all">
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{san.khuVuc}</span>
+                <h3 className="font-bold text-slate-800 text-base">{san.tenSan}</h3>
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${san.trangThai === 'hoat_dong' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                {san.trangThai === 'hoat_dong' ? 'Sẵn sàng' : 'Bảo trì'}
+              </span>
+            </div>
+
+            <div className="space-y-1 bg-slate-50 p-3 rounded-2xl text-xs">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Loại sân:</span>
+                <span className="font-bold text-slate-700">{san.loaiSan}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Giá cơ bản:</span>
+                <span className="font-bold text-emerald-600">{san.giaTheoGio.toLocaleString()}đ/h</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <button className="p-2 hover:bg-slate-100 rounded-xl text-slate-600 transition-all">
+                <Edit2 size={16} />
+              </button>
+              <button className="p-2 hover:bg-red-50 rounded-xl text-red-500 transition-all">
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
