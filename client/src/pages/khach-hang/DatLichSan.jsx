@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, CheckCircle2, Shield, Tag, CreditCard, ChevronRight, AlertCircle, Info } from 'lucide-react';
 import guiYeuCauApi from '../../api/gui-yeu-cau-api';
-
+import { useNavigate } from 'react-router-dom';
 export default function DatLichSan() {
+  const navigate = useNavigate();
   const [ngayDat, setNgayDat] = useState(new Date().toISOString().split('T')[0]);
   const [sanChon, setSanChon] = useState('1'); // ID sân
   const [gioDaChon, setGioDaChon] = useState([]); // mảng khung giờ đã chọn
@@ -43,11 +44,33 @@ export default function DatLichSan() {
   };
 
   const handleXacNhanDat = () => {
-    if (gioDaChon.length === 0) {
+   if (gioDaChon.length === 0) {
       alert('Vui lòng chọn ít nhất 1 khung giờ!');
       return;
     }
-    alert(`Đặt sân thành công! Tổng tiền: ${tongThanhToan.toLocaleString()}đ`);
+
+    // 1. Tạo đối tượng đơn hàng mới
+    const donHangMoi = {
+      id: `SCL-${Math.floor(10000 + Math.random() * 90000)}`,
+      ngayDat: ngayDat,
+      gioDat: gioDaChon.map(g => g.gio).join(', '),
+      tenSan: sanChon === '1' ? 'Sân 01 - Thảm Yonex VIP' : (sanChon === '2' ? 'Sân 02 - Thảm Victor Standard' : 'Sân 03 - Thảm Lining'),
+      tongTien: tongThanhToan,
+      trangThai: 'cho_checkin',
+      ngayTao: new Date().toLocaleString('vi-VN')
+    };
+
+    // 2. Lấy danh sách đơn cũ trong LocalStorage
+    const donHangCu = JSON.parse(localStorage.getItem('danh_sach_don_dat')) || [];
+
+    // 3. Thêm đơn hàng mới lên đầu danh sách và lưu lại LocalStorage
+    const danhSachCapNhat = [donHangMoi, ...donHangCu];
+    localStorage.setItem('danh_sach_don_dat', JSON.stringify(danhSachCapNhat));
+
+    alert(`Đặt sân thành công! Mã đơn: ${donHangMoi.id}`);
+    
+    // 4. Chuyển hướng ngay sang trang Lịch Sử Đặt Sân
+    navigate('/lich-su-dat');
   };
 
   return (

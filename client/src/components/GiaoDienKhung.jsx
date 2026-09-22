@@ -29,6 +29,7 @@ export default function GiaoDienKhung() {
     { label: 'Tin Khuyến Mãi', icon: Tag, path: '/khuyen-mai', vaiTro: ['khach_vang_lai'] },
 
     // --- KHÁCH HÀNG (Đã đăng nhập) ---
+    { label: 'Trang Chủ', icon: Home, path: '/', vaiTro: ['khach_vang_lai', 'khach_hang'] },
     { label: 'Đặt Sân Cầu Lông', icon: Calendar, path: '/dat-san', vaiTro: ['khach_hang'] },
     { label: 'Lịch Sử Đặt Sân', icon: History, path: '/lich-su-dat', vaiTro: ['khach_hang'] },
     { label: 'Thông Tin Cá Nhân', icon: User, path: '/thong-tin-ca-nhan', vaiTro: ['khach_hang'] },
