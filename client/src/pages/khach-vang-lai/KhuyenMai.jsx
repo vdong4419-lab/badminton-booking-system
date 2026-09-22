@@ -1,26 +1,74 @@
-import React from 'react';
-import { Tag, Gift, Percent } from 'lucide-react';
+import React, { useState } from 'react';
+import { Tag, Gift, Copy, Check, Calendar, ArrowRight } from 'lucide-react';
 
-export default function Promotions() {
-  const promos = [
-    { code: 'CHAOXUAN', discount: '20%', desc: 'Giảm 20% cho lượt đặt sân đầu tiên' },
-    { code: 'GIOSHANG', discount: '15%', desc: 'Giảm 15% khung giờ vàng (12:00 - 16:00)' },
+export default function KhuyenMai() {
+  const [copiedCode, setCopiedCode] = useState('');
+
+  const dsKhuyenMai = [
+    {
+      id: 1,
+      maCode: 'GIOVANG20',
+      tieuDe: 'Giảm 20% Cho Khung Giờ Sáng',
+      moTa: 'Áp dụng cho tất cả các đơn đặt sân trong khung giờ từ 05:00 đến 10:00 sáng từ Thứ 2 đến Thứ 6.',
+      hanDung: '30/10/2026',
+      mau: 'from-emerald-500 to-teal-700'
+    },
+    {
+      id: 2,
+      maCode: 'DATLICH3H',
+      tieuDe: 'Đặt 3 Tiếng - Tặng 1 Nước Yến/Pocari',
+      moTa: 'Đặt sân liên tục từ 3 giờ trở lên nhận ngay voucher 1 phần nước tự chọn tại quầy lễ tân.',
+      hanDung: '15/11/2026',
+      mau: 'from-amber-500 to-orange-600'
+    }
   ];
 
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(''), 2000);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-        <Gift className="w-7 h-7 text-emerald-600" /> Mã Ưu Đãi & Khuyến Mãi
-      </h1>
-      <div className="grid md:grid-cols-2 gap-4">
-        {promos.map((p) => (
-          <div key={p.code} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-start gap-4">
-            <div className="bg-emerald-100 text-emerald-700 p-3 rounded-xl font-bold text-lg flex items-center gap-1">
-              <Percent className="w-5 h-5" /> {p.discount}
+    <div className="max-w-6xl mx-auto space-y-6 pb-10">
+      <div className="bg-gradient-to-r from-red-500 via-rose-600 to-amber-500 text-white p-8 rounded-3xl shadow-xl flex items-center justify-between">
+        <div className="space-y-2 max-w-xl">
+          <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase">Săn Voucher Ưu Đãi</span>
+          <h1 className="text-3xl font-black">Khuyến Mãi Hot Hàng Tháng</h1>
+          <p className="text-xs text-white/80">Nhập mã giảm giá khi thanh toán hoặc đặt lịch trực tuyến để nhận ưu đãi đặc biệt.</p>
+        </div>
+        <Gift size={80} className="text-white/20 hidden md:block" />
+      </div>
+
+      {/* Danh sách Voucher Card */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {dsKhuyenMai.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div className="p-6 space-y-3">
+              <div className="flex justify-between items-start">
+                <span className={`px-3 py-1 rounded-lg text-white font-black text-xs bg-gradient-to-r ${item.mau}`}>
+                  {item.maCode}
+                </span>
+                <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                  <Calendar size={12} /> Hạn dùng: {item.hanDung}
+                </span>
+              </div>
+              
+              <h3 className="font-bold text-slate-800 text-base">{item.tieuDe}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{item.moTa}</p>
             </div>
-            <div>
-              <p className="font-bold text-gray-800">Mã: <span className="text-emerald-600">{p.code}</span></p>
-              <p className="text-sm text-gray-600 mt-1">{p.desc}</p>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <div className="text-xs text-slate-500">
+                Mã ưu đãi: <code className="font-bold text-emerald-600 text-sm bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{item.maCode}</code>
+              </div>
+              <button 
+                onClick={() => handleCopy(item.maCode)}
+                className="bg-slate-900 hover:bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5"
+              >
+                {copiedCode === item.maCode ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copiedCode === item.maCode ? 'Đã Chép Mã' : 'Sao Chép'}
+              </button>
             </div>
           </div>
         ))}

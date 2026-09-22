@@ -1,51 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import guiYeuCauApi from '../../api/gui-yeu-cau-api';
-import { DollarSign, Clock } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { DollarSign, Sun, Moon, Sparkles, Check, ArrowRight } from 'lucide-react';
 
-export default function BangGiaSan() {
-  const [bangGia, setBangGia] = useState([]);
+export default function BangGia() {
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    guiYeuCauApi.get('/khach-hang/bang-gia-va-khuyen-mai')
-      .then((res) => setBangGia(res.data.bangGia || []))
-      .catch((err) => console.log(err));
-  }, []);
+  const bangGiaCT = [
+    {
+      loai: 'Khung Giờ Sáng (Sáng - Chiều)',
+      gio: '05:00 - 16:00',
+      bieuTuong: Sun,
+      mauSac: 'from-amber-500 to-orange-500',
+      giaThuong: '70.000đ / giờ',
+      giaVip: '90.000đ / giờ',
+      uuDai: 'Phù hợp tập thể lực, học sinh - sinh viên'
+    },
+    {
+      loai: 'Khung Giờ Vàng (Tối Peak Hours)',
+      gio: '16:00 - 23:00',
+      bieuTuong: Moon,
+      mauSac: 'from-emerald-600 to-teal-800',
+      giaThuong: '100.000đ / giờ',
+      giaVip: '120.000đ / giờ',
+      uuDai: 'Bật full hệ thống đèn LED chống chói chuẩn BWF',
+      hot: true
+    }
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold flex items-center gap-2 text-emerald-700">
-        <DollarSign className="w-7 h-7" /> Bảng Giá Sân Cầu Lông
-      </h1>
+    <div className="max-w-6xl mx-auto space-y-8 pb-10">
+      <div className="text-center max-w-2xl mx-auto space-y-2">
+        <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold uppercase">Bảng giá niêm yết</span>
+        <h1 className="text-3xl font-black text-slate-800">Giá Thuê Sân Cầu Lông</h1>
+        <p className="text-sm text-slate-500">Bảng giá minh bạch, không phụ phí ẩn, đã bao gồm hệ thống chiếu sáng & thảm thi đấu chuẩn.</p>
+      </div>
 
-      <div className="bg-white p-6 rounded-2xl border shadow-sm">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b bg-emerald-50 text-emerald-800">
-              <th className="p-3">Loại Sân</th>
-              <th className="p-3">Khung Giờ</th>
-              <th className="p-3">Giá Tiền / Giờ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bangGia.length > 0 ? (
-              bangGia.map((item, idx) => (
-                <tr key={idx} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-semibold">{item.loai_san || 'Trong nhà'}</td>
-                  <td className="p-3 flex items-center gap-1 text-gray-600">
-                    <Clock className="w-4 h-4 text-emerald-600" /> {item.khung_gio || 'Cả ngày'}
-                  </td>
-                  <td className="p-3 font-bold text-emerald-600">
-                    {Number(item.gia_tien || 80000).toLocaleString()} đ
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="p-4 text-center text-gray-500">Chưa có dữ liệu bảng giá. Giá mặc định: 80.000đ/giờ.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Grid Thẻ Giá */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {bangGiaCT.map((item, idx) => {
+          const Icon = item.bieuTuong;
+          return (
+            <div key={idx} className={`relative bg-white rounded-3xl border ${item.hot ? 'border-emerald-500 shadow-xl' : 'border-slate-200 shadow-sm'} overflow-hidden flex flex-col justify-between`}>
+              {item.hot && (
+                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold uppercase px-4 py-1 rounded-bl-xl shadow">
+                  🔥 Giờ Cao Điểm
+                </div>
+              )}
+              
+              <div className="p-6 space-y-4">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${item.mauSac} text-white flex items-center justify-center shadow-md`}>
+                  <Icon size={24} />
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-slate-800">{item.loai}</h3>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">Khung giờ: {item.gio}</p>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600 font-medium">Sân Thảm Tiêu Chuẩn:</span>
+                    <span className="text-base font-extrabold text-slate-900">{item.giaThuong}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600 font-medium">Sân Thảm Yonex VIP:</span>
+                    <span className="text-base font-extrabold text-emerald-600">{item.giaVip}</span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-3 rounded-xl text-xs text-slate-600 flex items-center gap-2">
+                  <Sparkles size={16} className="text-amber-500 shrink-0" />
+                  <span>{item.uuDai}</span>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-50 border-t border-slate-100">
+                <button 
+                  onClick={() => navigate('/tra-cuu')}
+                  className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  Kiểm Tra Lịch Trống <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

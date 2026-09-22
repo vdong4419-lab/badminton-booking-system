@@ -1,84 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import guiYeuCauApi from '../../api/gui-yeu-cau-api';
-import { History, Calendar, Clock, DollarSign, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, MapPin, Tag, CheckCircle2, XCircle, AlertCircle, ChevronRight, FileText } from 'lucide-react';
 
 export default function LichSuDatSan() {
-  const [danhSachLichSu, setDanhSachLichSu] = useState([]);
+  // Dữ liệu đơn đặt lịch mẫu
+  const danhSachLichSu = [
+    {
+      id: 'SCL-88291',
+      ngayDat: '2026-09-22',
+      gioDat: '17:00 - 19:00 (2 Tiếng)',
+      tenSan: 'Sân 01 - Thảm Yonex VIP',
+      tongTien: 240000,
+      trangThai: 'da_xac_nhan', // da_xac_nhan, cho_checkin, da_huy
+      ngayTao: '21/09/2026 14:30'
+    },
+    {
+      id: 'SCL-77123',
+      ngayDat: '2026-09-18',
+      gioDat: '19:00 - 20:00 (1 Tiếng)',
+      tenSan: 'Sân 02 - Thảm Victor Standard',
+      tongTien: 100000,
+      trangThai: 'cho_checkin',
+      ngayTao: '17/09/2026 09:15'
+    },
+    {
+      id: 'SCL-66012',
+      ngayDat: '2026-09-10',
+      gioDat: '06:00 - 08:00 (2 Tiếng)',
+      tenSan: 'Sân 03 - Thảm Lining',
+      tongTien: 160000,
+      trangThai: 'da_huy',
+      ngayTao: '09/09/2026 20:00'
+    }
+  ];
 
-  useEffect(() => {
-    guiYeuCauApi.get('/khach-hang/lich-su-dat-san')
-      .then((res) => setDanhSachLichSu(res.data || []))
-      .catch((err) => console.log(err));
-  }, []);
-
-  const xuLyHuyDon = async (id) => {
-    const lyDo = prompt('Nhập lý do hủy đơn:');
-    if (!lyDo) return;
-
-    try {
-      await guiYeuCauApi.post('/khach-hang/yeu-cau-huy-don', { don_dat_id: id, ly_do_huy: lyDo });
-      alert('Đã gửi yêu cầu hủy đơn!');
-      window.location.reload();
-    } catch (err) {
-      alert('Lỗi hủy đơn!');
+  const renderBadgeTrangThai = (trangThai) => {
+    switch (trangThai) {
+      case 'da_xac_nhan':
+        return <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold flex items-center gap-1"><CheckCircle2 size={13} /> Hoàn Thành</span>;
+      case 'cho_checkin':
+        return <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold flex items-center gap-1"><Clock size={13} /> Chờ Check-in</span>;
+      case 'da_huy':
+        return <span className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold flex items-center gap-1"><XCircle size={13} /> Đã Hủy</span>;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <History className="text-emerald-600" /> Lịch Sử Đặt Sân
-        </h1>
-        <p className="text-sm text-slate-500">Quản lý và theo dõi trạng thái các đơn đặt sân của bạn.</p>
+    <div className="max-w-5xl mx-auto space-y-6 pb-10">
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+            <FileText className="text-emerald-600" /> Lịch Sử Đặt Sân Của Bạn
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">Quản lý và xem lại tất cả các đơn đặt sân cầu lông đã thực hiện</p>
+        </div>
+        <span className="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl border">
+          Tổng đơn: {danhSachLichSu.length}
+        </span>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b">
-              <th className="p-4">Mã Đơn</th>
-              <th className="p-4">Sân</th>
-              <th className="p-4">Ngày Đặt</th>
-              <th className="p-4">Khung Giờ</th>
-              <th className="p-4">Tổng Tiền</th>
-              <th className="p-4">Trạng Thái</th>
-              <th className="p-4 text-center">Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-sm">
-            {danhSachLichSu.length > 0 ? (
-              danhSachLichSu.map((don) => (
-                <tr key={don.id} className="hover:bg-slate-50/80 transition-all">
-                  <td className="p-4 font-bold text-slate-700">#{don.id}</td>
-                  <td className="p-4 font-medium">{don.ten_san || 'Sân số 1'}</td>
-                  <td className="p-4 text-slate-600">{don.ngay_dat}</td>
-                  <td className="p-4 text-slate-600">{don.gio_bat_dau} - {don.gio_ket_thuc}</td>
-                  <td className="p-4 font-extrabold text-emerald-600">{Number(don.tong_tien).toLocaleString()} đ</td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
-                      {don.trang_thai}
-                    </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    {don.trang_thai === 'da_dat_coc' && (
-                      <button
-                        onClick={() => xuLyHuyDon(don.id)}
-                        className="text-xs text-red-600 hover:text-red-800 font-bold border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50"
-                      >
-                        Hủy Đơn
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-6 text-center text-slate-400">Bạn chưa có đơn đặt sân nào.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Danh sách thẻ lịch sử */}
+      <div className="space-y-4">
+        {danhSachLichSu.map((item) => (
+          <div key={item.id} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all space-y-4">
+            
+            {/* Header Thẻ */}
+            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-slate-900 text-sm">{item.id}</span>
+                <span className="text-[11px] text-slate-400">| Ngày tạo: {item.ngayTao}</span>
+              </div>
+              {renderBadgeTrangThai(item.trangThai)}
+            </div>
+
+            {/* Chi tiết thông tin */}
+            <div className="grid sm:grid-cols-3 gap-4 text-xs">
+              <div className="space-y-1">
+                <span className="text-slate-400 font-bold block uppercase text-[10px]">Tên Sân</span>
+                <p className="font-bold text-slate-800 text-sm">{item.tenSan}</p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-slate-400 font-bold block uppercase text-[10px]">Ngày & Khung Giờ</span>
+                <p className="font-bold text-slate-800 flex items-center gap-1">
+                  <Calendar size={13} className="text-emerald-600" /> {item.ngayDat}
+                </p>
+                <p className="font-semibold text-slate-600 flex items-center gap-1">
+                  <Clock size={13} className="text-emerald-600" /> {item.gioDat}
+                </p>
+              </div>
+
+              <div className="space-y-1 sm:text-right">
+                <span className="text-slate-400 font-bold block uppercase text-[10px]">Tổng Tiền Thanh Toán</span>
+                <p className="font-black text-emerald-600 text-base">{item.tongTien.toLocaleString()}đ</p>
+              </div>
+            </div>
+
+          </div>
+        ))}
       </div>
     </div>
   );
