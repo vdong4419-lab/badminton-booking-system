@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, History, UserCheck, 
-  Users, Settings, LogOut, Shield, Menu, X, Tag, DollarSign, User, Activity, UserCog, Home, Search, Star
+  Users, Settings, LogOut, Shield, Menu, X, Tag, DollarSign, User, Activity, UserCog, Home, Search, Star,Clock
 } from 'lucide-react';
 
 export default function GiaoDienKhung() {
@@ -36,9 +36,11 @@ export default function GiaoDienKhung() {
     { label: 'Đánh Giá Sân', icon: Star, path: '/danh-gia', vaiTro: ['khach_hang'] },
     
     // --- LỄ TÂN (Nhiệm vụ vận hành) ---
-    { label: 'Xác Nhận Khách Đến', icon: UserCheck, path: '/le-tan/xac-nhan', vaiTro: ['le_tan'] },
-    { label: 'Trạng Thái Sân', icon: Activity, path: '/le-tan/trang-thai-san', vaiTro: ['le_tan'] },
-    
+   { label: 'Quản Lý Lịch Đặt', icon: Calendar, path: '/le-tan/quan-ly-dat-san', vaiTro: ['le_tan', 'admin'] },
+{ label: 'Quản Lý Sân', icon: Activity, path: '/le-tan/trang-thai-san', vaiTro: ['le_tan', 'admin'] },
+{ label: 'Quản Lý Khung Giờ', icon: Clock, path: '/le-tan/khung-gio', vaiTro: ['le_tan', 'admin'] },
+{ label: 'Quản Lý Khách Hàng', icon: Users, path: '/le-tan/khach-hang', vaiTro: ['le_tan', 'admin'] },
+{ label: 'Xác Nhận Khách Đến', icon: UserCheck, path: '/le-tan/check-in', vaiTro: ['le_tan', 'admin'] },
     // --- ADMIN (Chỉ tập trung quản lý) ---
     { label: 'Thống Kê Doanh Thu', icon: LayoutDashboard, path: '/admin/thong-ke', vaiTro: ['admin'] },
     { label: 'Quản Lý Sân', icon: Settings, path: '/admin/quan-ly-san', vaiTro: ['admin'] },

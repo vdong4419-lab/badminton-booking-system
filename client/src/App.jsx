@@ -21,7 +21,11 @@ import ThongTinCaNhan from './pages/khach-hang/ThongTinCaNhan';
 import DanhGiaSan from './pages/khach-hang/DanhGiaSan';
 import ThanhToanCoc from './pages/khach-hang/ThanhToanCoc';
 // Trang Lễ Tân
+import QuanLyLichDat from './pages/le-tan/QuanLyLichDat';
+import QuanLyTrangThaiSan from './pages/le-tan/QuanLyTrangThaiSan';
 import XacNhanKhachDen from './pages/le-tan/XacNhanKhachDen';
+import QuanLyKhungGio from './pages/le-tan/QuanLyKhungGio';
+import QuanLyKhachHangLeTan from './pages/le-tan/QuanLyKhachHangLeTan';
 
 // Trang Admin
 import ThongKeBaoCao from './pages/admin/ThongKeBaoCao';
@@ -54,9 +58,13 @@ export default function App() {
           </Route>
 
           {/* 3. CHỨC NĂNG DÀNH CHO LỄ TÂN & ADMIN */}
-          <Route element={<BaoVeRoute vaiTroPhep={['le_tan', 'admin']} />}>
-            <Route path="le-tan/xac-nhan" element={<XacNhanKhachDen />} />
-          </Route>
+         <Route element={<BaoVeRoute vaiTroPhep={['le_tan', 'admin']} />}>
+  <Route path="/le-tan/quan-ly-dat-san" element={<QuanLyLichDat />} />
+  <Route path="/le-tan/trang-thai-san" element={<QuanLyTrangThaiSan />} />
+  <Route path="/le-tan/khung-gio" element={<QuanLyKhungGio />} />
+  <Route path="/le-tan/khach-hang" element={<QuanLyKhachHangLeTan />} />
+  <Route path="/le-tan/check-in" element={<XacNhanKhachDen />} />
+</Route>
 
           {/* 4. CHỨC NĂNG CHỈ DÀNH CHO ADMIN (Role 1) */}
           <Route element={<BaoVeRoute vaiTroPhep={['admin']} />}>

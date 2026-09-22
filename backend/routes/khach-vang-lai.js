@@ -3,6 +3,99 @@ const router = express.Router();
 const db = require('../config/ket-noi-csdl');
 const xacThucToken = require('../middleware/xac-thuc-dang-nhap');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'BiMatBaoMat123';
+
+// ==========================================
+// 1. API ĐĂNG KÝ (Lưu vào bảng `nguoi_dung`)
+// ==========================================
+router.post('/dang-ky', async (req, res) => {
+  const { ho_ten, email, so_dien_thoai, mat_khau } = req.body;
+
+  if (!ho_ten || !email || !mat_khau) {
+    return res.status(400).json({ message: 'Vui lòng điền đầy đủ Họ tên, Email và Mật khẩu!' });
+  }
+
+  try {
+    // 1. Kiểm tra Email đã tồn tại trong bảng `nguoi_dung` chưa
+    const [existingUsers] = await db.query('SELECT id FROM nguoi_dung WHERE email = ?', [email]);
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'Email này đã được đăng ký tài khoản!' });
+    }
+
+    // 2. Mã hóa mật khẩu
+    const salt = await bcrypt.genSalt(10);
+    const matKhauMaHoa = await bcrypt.hash(mat_khau, salt);
+
+    // 3. Thêm mới người dùng vào CSDL với vai trò mặc định 'khach_hang'
+    const [result] = await db.query(
+      `INSERT INTO nguoi_dung (ho_ten, email, so_dien_thoai, mat_khau, vai_tro, trang_thai) 
+       VALUES (?, ?, ?, ?, 'khach_hang', 'hoat_dong')`,
+      [ho_ten, email, so_dien_thoai || null, matKhauMaHoa]
+    );
+
+    res.status(201).json({ message: 'Đăng ký tài khoản thành công! Vui lòng đăng nhập.' });
+  } catch (error) {
+    console.error('Lỗi Đăng Ký:', error);
+    res.status(500).json({ message: 'Lỗi máy chủ khi đăng ký tài khoản!', error });
+  }
+});
+
+// ==========================================
+// 2. API ĐĂNG NHẬP (Xác thực với bảng `nguoi_dung`)
+// ==========================================
+router.post('/dang-nhap', async (req, res) => {
+  const { email, mat_khau } = req.body;
+
+  if (!email || !mat_khau) {
+    return res.status(400).json({ message: 'Vui lòng nhập đầy đủ Email và Mật khẩu!' });
+  }
+
+  try {
+    // 1. Tìm người dùng theo Email
+    const [users] = await db.query('SELECT * FROM nguoi_dung WHERE email = ?', [email]);
+    if (users.length === 0) {
+      return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác!' });
+    }
+
+    const user = users[0];
+
+    // 2. Kiểm tra nếu tài khoản bị khóa
+    if (user.trang_thai === 'bi_khoa') {
+      return res.status(403).json({ message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!' });
+    }
+
+    // 3. So sánh mật khẩu Hash
+    const isMatch = await bcrypt.compare(mat_khau, user.mat_khau);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác!' });
+    }
+
+    // 4. Tạo JWT Token chứa thông tin vai trò
+    const token = jwt.sign(
+      { id: user.id, ho_ten: user.ho_ten, email: user.email, vai_tro: user.vai_tro },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // 5. Trả về kết quả cho Frontend
+    res.json({
+      message: 'Đăng nhập thành công!',
+      token: token,
+      user: {
+        id: user.id,
+        ho_ten: user.ho_ten,
+        email: user.email,
+        so_dien_thoai: user.so_dien_thoai,
+        vai_tro: user.vai_tro
+      }
+    });
+  } catch (error) {
+    console.error('Lỗi Đăng Nhập:', error);
+    res.status(500).json({ message: 'Lỗi máy chủ khi đăng nhập!', error });
+  }
+});
+
+module.exports = router;
 // UC01: Xem danh sách & Tìm kiếm / Lọc sân
 router.get('/danh-sach-san', async (req, res) => {
   const { loai_san, tim_kiem } = req.query;
@@ -63,12 +156,12 @@ router.post('/tao-don-dat-san', xacThucToken, async (req, res) => {
 
   try {
     // Kiểm tra trùng lịch
-    const [trungLich] = await db.query(
-      `SELECT id FROM don_dat_san 
-       WHERE san_id = ? AND ngay_dat = ? AND trang_thai != 'da_huy'
-       AND ((gio_bat_dau < ? AND gio_ket_thuc > ?))`,
-      [san_id, ngay_dat, gio_ket_thuc, gio_bat_dau]
-    );
+   const [trungLich] = await db.query(
+  `SELECT id FROM don_dat_san 
+   WHERE san_id = ? AND ngay_dat = ? AND trang_thai != 'da_huy'
+   AND (gio_bat_dau < ? AND gio_ket_thuc > ?)`,
+  [san_id, ngay_dat, gio_ket_thuc, gio_bat_dau] // gio_ket_thuc đưa vào trước, gio_bat_dau đưa vào sau
+);
 
     if (trungLich.length > 0) {
       return res.status(400).json({ message: 'Khung giờ này đã có người đặt!' });

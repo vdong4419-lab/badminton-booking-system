@@ -1,77 +1,114 @@
 import React, { useState } from 'react';
-import guiYeuCauApi from '../../api/gui-yeu-cau-api';
-import { UserCheck, Search, CheckCircle } from 'lucide-react';
+import { UserCheck, Search, CheckCircle2, DollarSign, Clock } from 'lucide-react';
 
 export default function XacNhanKhachDen() {
-  const [maDon, setMaDon] = useState('');
-  const [thongTinDon, setThongTinDon] = useState(null);
-  const [thongBao, setThongBao] = useState('');
+  const [tuKhoa, setTuKhoa] = useState('');
+  const [donTimThay, setDonTimThay] = useState(null);
 
-  const timKiemDon = async () => {
-    try {
-      const res = await guiYeuCauApi.get(`/le-tan/danh-sach-lich-dat`);
-      const donFound = res.data.find((d) => d.id === parseInt(maDon));
-      if (donFound) {
-        setThongTinDon(donFound);
-        setThongBao('');
-      } else {
-        setThongTinDon(null);
-        setThongBao('Không tìm thấy mã đơn đặt sân!');
-      }
-    } catch (err) {
-      setThongBao('Lỗi tìm kiếm đơn!');
-    }
+  const handleTimKiem = (e) => {
+    e.preventDefault();
+    if (!tuKhoa) return;
+
+    // Giả lập tìm kiếm đơn đặt
+    setDonTimThay({
+      id: 1,
+      maDon: 'SCL-77123',
+      khachHang: 'Lê Văn C',
+      soDienThoai: '0908888888',
+      tenSan: 'Sân 2 (Thảm Victor)',
+      ngayDat: '2026-09-22',
+      gioDat: '19:00 - 20:00',
+      tongTien: 80000,
+      tienCoc: 40000,
+      conLai: 40000,
+      trangThai: 'da_dat_coc'
+    });
   };
 
-  const xuLyCheckIn = async () => {
-    try {
-      const res = await guiYeuCauApi.post('/le-tan/xac-nhan-khach-den', { don_id: thongTinDon.id });
-      alert(res.data.message);
-      setThongTinDon(null);
-      setMaDon('');
-    } catch (err) {
-      alert('Lỗi xác nhận check-in!');
+  const handleCheckIn = () => {
+    if (window.confirm(`Xác nhận check-in và thu ${donTimThay.conLai.toLocaleString()}đ tiền còn lại?`)) {
+      setDonTimThay({ ...donTimThay, trangThai: 'dang_su_dung' });
+      alert('Check-in thành công! Khách có thể nhận sân.');
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border space-y-6">
-      <h1 className="text-2xl font-bold flex items-center gap-2 text-emerald-700">
-        <UserCheck className="w-7 h-7" /> Lễ Tân - Xác Nhận Khách Đến Sân
-      </h1>
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Nhập Mã Đơn Đặt (Ví dụ: 101)"
-          value={maDon}
-          onChange={(e) => setMaDon(e.target.value)}
-          className="flex-1 border p-3 rounded-xl focus:outline-emerald-600"
-        />
-        <button
-          onClick={timKiemDon}
-          className="bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold flex items-center gap-1 hover:bg-emerald-700"
-        >
-          <Search className="w-5 h-5" /> Tra Cứu
-        </button>
+    <div className="max-w-3xl mx-auto space-y-6 pb-10">
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center space-y-2">
+        <h1 className="text-2xl font-black text-slate-800 flex items-center justify-center gap-2">
+          <UserCheck className="text-emerald-600" /> Xác Nhận Khách Đến & Check-in
+        </h1>
+        <p className="text-xs text-slate-500">Tra cứu nhanh phiếu đặt sân bằng Số Điện Thoại hoặc Mã Đơn Hàng</p>
       </div>
 
-      {thongBao && <p className="text-red-500 font-medium">{thongBao}</p>}
+      {/* Thanh Tìm Kiếm */}
+      <form onSubmit={handleTimKiem} className="flex gap-2">
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-4 top-3.5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Nhập SĐT hoặc Mã đơn (VD: SCL-77123)..."
+            value={tuKhoa}
+            onChange={(e) => setTuKhoa(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+          />
+        </div>
+        <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-3 rounded-2xl transition-all shadow-md">
+          Tra Cứu
+        </button>
+      </form>
 
-      {thongTinDon && (
-        <div className="border border-emerald-200 bg-emerald-50 p-5 rounded-xl space-y-3">
-          <p className="font-bold text-lg text-emerald-900">Mã đơn: #{thongTinDon.id}</p>
-          <p><strong>Khách hàng:</strong> {thongTinDon.ho_ten} ({thongTinDon.so_dien_thoai})</p>
-          <p><strong>Sân:</strong> {thongTinDon.ten_san}</p>
-          <p><strong>Khung giờ:</strong> {thongTinDon.gio_bat_dau} - {thongTinDon.gio_ket_thuc} ({thongTinDon.ngay_dat})</p>
-          <p><strong>Trạng thái:</strong> <span className="uppercase font-semibold text-emerald-700">{thongTinDon.trang_thai}</span></p>
+      {/* Kết Quả Tra Cứu */}
+      {donTimThay && (
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg space-y-6">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Mã phiếu đặt</span>
+              <h3 className="font-black text-slate-900 text-lg">{donTimThay.maDon}</h3>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+              donTimThay.trangThai === 'dang_su_dung' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+            }`}>
+              {donTimThay.trangThai === 'dang_su_dung' ? 'Đang sử dụng' : 'Chờ Check-in'}
+            </span>
+          </div>
 
-          <button
-            onClick={xuLyCheckIn}
-            className="w-full mt-3 bg-emerald-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-700"
-          >
-            <CheckCircle className="w-5 h-5" /> Xác Nhận Check-In Sử Dụng Sân
-          </button>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span className="text-slate-400 font-bold block">Khách Hàng:</span>
+              <p className="font-bold text-slate-800 text-sm">{donTimThay.khachHang}</p>
+              <p className="text-slate-500">{donTimThay.soDienThoai}</p>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block">Thông Tin Sân:</span>
+              <p className="font-bold text-slate-800 text-sm">{donTimThay.tenSan}</p>
+              <p className="text-emerald-600 font-semibold">{donTimThay.gioDat}</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-2xl space-y-2 text-xs">
+            <div className="flex justify-between text-slate-600">
+              <span>Tổng tiền đơn:</span>
+              <span className="font-bold">{donTimThay.tongTien.toLocaleString()}đ</span>
+            </div>
+            <div className="flex justify-between text-slate-600">
+              <span>Đã đặt cọc:</span>
+              <span className="font-bold text-emerald-600">-{donTimThay.tienCoc.toLocaleString()}đ</span>
+            </div>
+            <div className="flex justify-between text-slate-900 font-black text-sm pt-2 border-t border-slate-200">
+              <span>Cần thu còn lại tại quầy:</span>
+              <span className="text-red-500">{donTimThay.conLai.toLocaleString()}đ</span>
+            </div>
+          </div>
+
+          {donTimThay.trangThai !== 'dang_su_dung' && (
+            <button
+              onClick={handleCheckIn}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-emerald-600/20 text-xs transition-all flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 size={16} /> Xác Nhận Khách Nhận Sân & Thu Tiền
+            </button>
+          )}
         </div>
       )}
     </div>
