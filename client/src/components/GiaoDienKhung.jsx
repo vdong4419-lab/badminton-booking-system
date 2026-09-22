@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, History, UserCheck, 
-  Users, Settings, LogOut, Shield, Menu, X, Tag, DollarSign, User, Activity, UserCog, Home, Search
+  Users, Settings, LogOut, Shield, Menu, X, Tag, DollarSign, User, Activity, UserCog, Home, Search, Star
 } from 'lucide-react';
 
 export default function GiaoDienKhung() {
@@ -33,6 +33,7 @@ export default function GiaoDienKhung() {
     { label: 'Đặt Sân Cầu Lông', icon: Calendar, path: '/dat-san', vaiTro: ['khach_hang'] },
     { label: 'Lịch Sử Đặt Sân', icon: History, path: '/lich-su-dat', vaiTro: ['khach_hang'] },
     { label: 'Thông Tin Cá Nhân', icon: User, path: '/thong-tin-ca-nhan', vaiTro: ['khach_hang'] },
+    { label: 'Đánh Giá Sân', icon: Star, path: '/danh-gia', vaiTro: ['khach_hang'] },
     
     // --- LỄ TÂN (Nhiệm vụ vận hành) ---
     { label: 'Xác Nhận Khách Đến', icon: UserCheck, path: '/le-tan/xac-nhan', vaiTro: ['le_tan'] },

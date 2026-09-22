@@ -44,7 +44,7 @@ export default function DatLichSan() {
   };
 
   const handleXacNhanDat = () => {
-   if (gioDaChon.length === 0) {
+    if (gioDaChon.length === 0) {
       alert('Vui lòng chọn ít nhất 1 khung giờ!');
       return;
     }
@@ -67,10 +67,8 @@ export default function DatLichSan() {
     const danhSachCapNhat = [donHangMoi, ...donHangCu];
     localStorage.setItem('danh_sach_don_dat', JSON.stringify(danhSachCapNhat));
 
-    alert(`Đặt sân thành công! Mã đơn: ${donHangMoi.id}`);
-    
-    // 4. Chuyển hướng ngay sang trang Lịch Sử Đặt Sân
-    navigate('/lich-su-dat');
+    // 4. BỎ THÔNG BÁO ALERT Ở ĐÂY VÀ CHUYỂN HƯỚNG SANG TRANG THANH TOÁN
+    navigate('/thanh-toan-coc', { state: { donDatInfo: donHangMoi } });
   };
 
   return (

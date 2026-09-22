@@ -18,7 +18,8 @@ import DangNhap from './pages/khach-vang-lai/DangNhap';
 import DatLichSan from './pages/khach-hang/DatLichSan';
 import LichSuDatSan from './pages/khach-hang/LichSuDatSan';
 import ThongTinCaNhan from './pages/khach-hang/ThongTinCaNhan';
-
+import DanhGiaSan from './pages/khach-hang/DanhGiaSan';
+import ThanhToanCoc from './pages/khach-hang/ThanhToanCoc';
 // Trang Lễ Tân
 import XacNhanKhachDen from './pages/le-tan/XacNhanKhachDen';
 
@@ -48,6 +49,8 @@ export default function App() {
             <Route path="dat-san" element={<DatLichSan />} />
             <Route path="lich-su-dat" element={<LichSuDatSan />} />
             <Route path="thong-tin-ca-nhan" element={<ThongTinCaNhan />} />
+            <Route path="danh-gia" element={<DanhGiaSan />} />
+            <Route path="thanh-toan-coc" element={<ThanhToanCoc />} />
           </Route>
 
           {/* 3. CHỨC NĂNG DÀNH CHO LỄ TÂN & ADMIN */}
