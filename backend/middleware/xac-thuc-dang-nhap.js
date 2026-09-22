@@ -1,17 +1,18 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+module.exports = function xacThucDangNhap(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Lấy Bearer <token>
 
   if (!token) {
-    return res.status(401).json({ message: 'Không có quyền truy cập, vui lòng đăng nhập!' });
+    return res.status(401).json({ message: 'Vui lòng đăng nhập để thực hiện thao tác này!' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Lưu thông tin decoded (id, role_id) vào request
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'BiMatBaoMat123');
+    req.user = decoded; // Chứa { id, ho_ten, vai_tro }
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn!' });
+    return res.status(403).json({ message: 'Phên đăng nhập hết hạn hoặc không hợp lệ!' });
   }
 };
